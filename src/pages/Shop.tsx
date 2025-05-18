@@ -7,6 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { mockProducts } from '@/data/mockProducts';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
 
 const Shop = () => {
   const location = useLocation();
@@ -18,6 +26,8 @@ const Shop = () => {
   );
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 150000]);
   const [sortBy, setSortBy] = useState<string>('featured');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const productsPerPage = 9; // Number of products per page
   
   // Get all unique categories
   const categories = Array.from(new Set(mockProducts.map(product => product.category)));
@@ -48,16 +58,114 @@ const Shop = () => {
     }
   });
   
+  // Pagination logic
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top when changing page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
   const handleCategoryChange = (category: string) => {
     setSelectedCategories(prev => 
       prev.includes(category)
         ? prev.filter(c => c !== category)
         : [...prev, category]
     );
+    setCurrentPage(1); // Reset to first page when changing filters
   };
   
   const handlePriceChange = (value: number[]) => {
     setPriceRange([value[0], value[1]]);
+    setCurrentPage(1); // Reset to first page when changing filters
+  };
+
+  // Generate page numbers for pagination
+  const generatePaginationItems = () => {
+    const items = [];
+    
+    if (totalPages <= 5) {
+      // Show all pages if total pages are 5 or less
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              isActive={currentPage === i} 
+              onClick={() => handlePageChange(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      // Show first page
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink 
+            isActive={currentPage === 1} 
+            onClick={() => handlePageChange(1)}
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      
+      // Show dots if current page is > 3
+      if (currentPage > 3) {
+        items.push(
+          <PaginationItem key="ellipsis1">
+            <PaginationLink className="cursor-default">...</PaginationLink>
+          </PaginationItem>
+        );
+      }
+      
+      // Show current page and adjacent pages
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        if (i !== 1 && i !== totalPages) {
+          items.push(
+            <PaginationItem key={i}>
+              <PaginationLink 
+                isActive={currentPage === i} 
+                onClick={() => handlePageChange(i)}
+              >
+                {i}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
+      }
+      
+      // Show dots if current page is < totalPages - 2
+      if (currentPage < totalPages - 2) {
+        items.push(
+          <PaginationItem key="ellipsis2">
+            <PaginationLink className="cursor-default">...</PaginationLink>
+          </PaginationItem>
+        );
+      }
+      
+      // Show last page
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink 
+            isActive={currentPage === totalPages} 
+            onClick={() => handlePageChange(totalPages)}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return items;
   };
   
   return (
@@ -116,13 +224,16 @@ const Shop = () => {
             {/* Sort controls */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
               <p className="text-gray-600 mb-4 sm:mb-0">
-                Showing {sortedProducts.length} products
+                Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, sortedProducts.length)} of {sortedProducts.length} products
               </p>
               <div className="flex items-center">
                 <span className="mr-2">Sort by:</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => {
+                    setSortBy(e.target.value);
+                    setCurrentPage(1); // Reset to first page when changing sort
+                  }}
                   className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-1 focus:ring-brand-orange"
                 >
                   <option value="featured">Featured</option>
@@ -135,10 +246,33 @@ const Shop = () => {
             
             {/* Products grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedProducts.map(product => (
+              {currentProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
+            
+            {/* Pagination */}
+            {sortedProducts.length > 0 && (
+              <Pagination className="my-8">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {generatePaginationItems()}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
             
             {/* Empty state */}
             {sortedProducts.length === 0 && (
@@ -149,6 +283,7 @@ const Shop = () => {
                   onClick={() => {
                     setSelectedCategories([]);
                     setPriceRange([0, 150000]);
+                    setCurrentPage(1);
                   }}
                 >
                   Reset Filters
