@@ -9,6 +9,10 @@ import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
 import LuxuryCorner from "./pages/LuxuryCorner";
 import Login from "./pages/Login";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Faq from "./pages/Faq";
+import Track from "./pages/Track";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +29,10 @@ const App = () => (
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/luxury-corner" element={<LuxuryCorner />} />
           <Route path="/account" element={<Login />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/track" element={<Track />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
