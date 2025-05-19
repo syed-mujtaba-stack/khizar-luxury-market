@@ -50,9 +50,11 @@ const Wishlist = () => {
           <div className="text-center py-16">
             <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 mb-6">Your wishlist is empty</p>
-            <Button as={Link} to="/shop" className="mb-2">
-              Start Shopping
-            </Button>
+            <Link to="/shop">
+              <Button className="mb-2">
+                Start Shopping
+              </Button>
+            </Link>
           </div>
         </div>
       </Layout>

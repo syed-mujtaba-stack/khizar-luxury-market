@@ -83,9 +83,11 @@ const Cart = () => {
           <div className="text-center py-16">
             <ShoppingBag className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 mb-6">Your cart is empty</p>
-            <Button as={Link} to="/shop" className="mb-2">
-              Continue Shopping
-            </Button>
+            <Link to="/shop">
+              <Button className="mb-2">
+                Continue Shopping
+              </Button>
+            </Link>
           </div>
         </div>
       </Layout>
@@ -185,9 +187,11 @@ const Cart = () => {
             
             {/* Continue shopping */}
             <div className="mt-6">
-              <Button variant="outline" as={Link} to="/shop" className="flex items-center gap-2">
-                Continue Shopping
-              </Button>
+              <Link to="/shop">
+                <Button variant="outline" className="flex items-center gap-2">
+                  Continue Shopping
+                </Button>
+              </Link>
             </div>
           </div>
           
@@ -247,12 +251,12 @@ const Cart = () => {
               </div>
               
               {/* Checkout button */}
-              <Button className="w-full mt-6 bg-brand-orange hover:bg-brand-orange/90 flex items-center justify-center gap-2" asChild>
-                <Link to="/checkout">
+              <Link to="/checkout" className="block w-full mt-6">
+                <Button className="w-full bg-brand-orange hover:bg-brand-orange/90 flex items-center justify-center gap-2">
                   Proceed to Checkout
                   <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
