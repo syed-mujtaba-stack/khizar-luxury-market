@@ -15,6 +15,9 @@ import {
 export const Header: React.FC = () => {
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Mock cart count for demonstration
+  const cartCount = 2;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -36,6 +39,8 @@ export const Header: React.FC = () => {
             <Link to="/about" className="hover:text-brand-orange transition-colors">About Us</Link>
             <span>|</span>
             <Link to="/contact" className="hover:text-brand-orange transition-colors">Contact</Link>
+            <span>|</span>
+            <Link to="/faq" className="hover:text-brand-orange transition-colors">FAQs</Link>
           </div>
         </div>
 
@@ -103,7 +108,7 @@ export const Header: React.FC = () => {
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />
                   <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    0
+                    {cartCount}
                   </span>
                 </Button>
               </Link>
@@ -150,9 +155,13 @@ export const Header: React.FC = () => {
               <Link to="/category/clothing" className="py-2 border-b" onClick={toggleMenu}>Clothing</Link>
               <Link to="/category/electronics" className="py-2 border-b" onClick={toggleMenu}>Electronics</Link>
               <Link to="/category/home-decor" className="py-2 border-b" onClick={toggleMenu}>Home Decor</Link>
+              <Link to="/cart" className="py-2 border-b" onClick={toggleMenu}>Cart</Link>
+              <Link to="/wishlist" className="py-2 border-b" onClick={toggleMenu}>Wishlist</Link>
+              <Link to="/account" className="py-2 border-b" onClick={toggleMenu}>My Account</Link>
               <Link to="/track" className="py-2 border-b" onClick={toggleMenu}>Track Order</Link>
               <Link to="/about" className="py-2 border-b" onClick={toggleMenu}>About Us</Link>
               <Link to="/contact" className="py-2 border-b" onClick={toggleMenu}>Contact</Link>
+              <Link to="/faq" className="py-2 border-b" onClick={toggleMenu}>FAQs</Link>
             </nav>
           </div>
         </div>
