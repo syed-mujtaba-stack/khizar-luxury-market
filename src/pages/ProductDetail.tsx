@@ -8,6 +8,7 @@ import { Star, ShoppingCart, Heart, Volume2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { mockProducts } from '@/data/mockProducts';
 import { Product } from '@/types/product';
+import { useCart } from '@/hooks/useCart';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const speechSynthRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const { addToCart } = useCart();
   
   useEffect(() => {
     // Find product by id
@@ -39,9 +41,19 @@ const ProductDetail = () => {
     }
   };
   
-  // Add to cart
+  // Add to cart - now using our cart hook
   const handleAddToCart = () => {
     if (product) {
+      // Add the product to cart multiple times based on quantity
+      for (let i = 0; i < quantity; i++) {
+        addToCart({
+          id: product.id,
+          name: product.name,
+          price: product.discountPrice || product.price,
+          image: product.image,
+        });
+      }
+      
       toast({
         title: "Added to Cart",
         description: `${quantity} x ${product.name} has been added to your cart`,

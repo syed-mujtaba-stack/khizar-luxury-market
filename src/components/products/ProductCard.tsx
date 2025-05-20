@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '../ui/use-toast';
 import { Product } from '@/types/product';
+import { useCart } from '@/hooks/useCart';
 
 interface ProductCardProps {
   product: Product;
@@ -23,6 +24,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     isLuxury,
   } = product;
 
+  const { addToCart } = useCart();
+
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     toast({
@@ -33,9 +36,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    toast({
-      title: "Added to Cart",
-      description: `${name} has been added to your cart`,
+    addToCart({
+      id,
+      name,
+      price: discountPrice || price,
+      image,
     });
   };
 
