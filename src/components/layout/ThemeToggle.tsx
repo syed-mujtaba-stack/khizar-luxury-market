@@ -12,14 +12,15 @@ const ThemeToggle: React.FC = () => {
       variant="ghost" 
       size="icon" 
       onClick={toggleTheme}
-      className="rounded-full"
+      className="rounded-full transition-colors hover:bg-accent"
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (
-        <Moon className="h-5 w-5" />
+        <Moon className="h-5 w-5 transition-transform duration-500 rotate-0" />
       ) : (
-        <Sun className="h-5 w-5" />
+        <Sun className="h-5 w-5 transition-transform duration-500 rotate-0" />
       )}
+      <span className="sr-only">Toggle theme</span>
     </Button>
   );
 };

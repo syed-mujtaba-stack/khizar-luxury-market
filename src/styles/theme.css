@@ -48,4 +48,18 @@
     --input: 240 3.7% 15.9%;
     --ring: 24 100% 53%;
   }
+  
+  /* Add smooth transitions when theme changes */
+  * {
+    transition-property: color, background-color, border-color;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
+}
+
+/* Additional theme utility classes */
+@layer utilities {
+  .text-gradient-primary {
+    @apply bg-gradient-to-br from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent;
+  }
 }
