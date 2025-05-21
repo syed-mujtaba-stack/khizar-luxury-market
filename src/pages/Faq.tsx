@@ -3,20 +3,31 @@ import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Accordion, 
   AccordionContent, 
   AccordionItem, 
   AccordionTrigger 
 } from '@/components/ui/accordion';
-import { Search } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Mail, Send } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 const Faq = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [showContactForm, setShowContactForm] = useState(false);
   
   // FAQ categories with questions and answers
   const faqCategories = [
     {
+      id: 'shopping',
       title: "Shopping & Orders",
       faqs: [
         {
@@ -38,6 +49,7 @@ const Faq = () => {
       ]
     },
     {
+      id: 'shipping',
       title: "Shipping & Delivery",
       faqs: [
         {
@@ -59,6 +71,7 @@ const Faq = () => {
       ]
     },
     {
+      id: 'returns',
       title: "Returns & Refunds",
       faqs: [
         {
@@ -80,6 +93,7 @@ const Faq = () => {
       ]
     },
     {
+      id: 'products',
       title: "Products & Quality",
       faqs: [
         {
@@ -101,6 +115,7 @@ const Faq = () => {
       ]
     },
     {
+      id: 'account',
       title: "Account & Security",
       faqs: [
         {
@@ -123,16 +138,48 @@ const Faq = () => {
     }
   ];
   
-  // Filter FAQs based on search query
-  const filteredFaqs = searchQuery.trim() === '' 
-    ? faqCategories 
-    : faqCategories.map(category => ({
-        ...category,
-        faqs: category.faqs.filter(faq => 
-          faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
-          faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      })).filter(category => category.faqs.length > 0);
+  // Filter FAQs based on search query and active tab
+  const filteredFaqs = faqCategories
+    .filter(category => activeTab === 'all' || category.id === activeTab)
+    .map(category => ({
+      ...category,
+      faqs: category.faqs.filter(faq => 
+        searchQuery.trim() === '' || 
+        faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    })).filter(category => category.faqs.length > 0);
+  
+  const handleContactFormChange = (e) => {
+    const { name, value } = e.target;
+    setContactForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleContactSubmit = (e) => {
+    e.preventDefault();
+    
+    // In a real app, you would send this data to your backend
+    console.log('Contact form data:', contactForm);
+    
+    // Show success message
+    toast({
+      title: "Message Sent",
+      description: "Thank you for your message. We'll get back to you soon!",
+    });
+    
+    // Clear form
+    setContactForm({
+      name: '',
+      email: '',
+      message: ''
+    });
+    
+    // Hide form
+    setShowContactForm(false);
+  };
   
   return (
     <Layout>
@@ -148,7 +195,7 @@ const Faq = () => {
       
       <div className="container mx-auto px-4 py-16">
         {/* Search bar */}
-        <div className="max-w-2xl mx-auto mb-12">
+        <div className="max-w-2xl mx-auto mb-8">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
@@ -163,45 +210,106 @@ const Faq = () => {
           </div>
         </div>
         
-        {/* FAQ content */}
-        {filteredFaqs.length > 0 ? (
-          filteredFaqs.map((category, index) => (
-            category.faqs.length > 0 && (
-              <div key={index} className="mb-12">
-                <h2 className="text-2xl font-serif font-bold mb-6">{category.title}</h2>
-                <Accordion type="single" collapsible className="space-y-4">
-                  {category.faqs.map((faq, faqIndex) => (
-                    <AccordionItem 
-                      key={faqIndex} 
-                      value={`${index}-${faqIndex}`}
-                      className="border border-gray-200 rounded-md overflow-hidden"
-                    >
-                      <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 font-medium text-left">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="px-6 py-4 bg-gray-50">
-                        <p className="text-gray-700">{faq.answer}</p>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </div>
-            )
-          ))
-        ) : (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-medium mb-3">No results found</h3>
-            <p className="text-gray-600 mb-6">
-              We couldn't find any FAQs matching your search. Try different keywords or browse our FAQ categories.
-            </p>
-            <Button 
-              variant="outline" 
-              onClick={() => setSearchQuery('')}
-            >
-              Clear Search
-            </Button>
-          </div>
-        )}
+        {/* Tabs for category navigation */}
+        <div className="max-w-4xl mx-auto mb-10">
+          <Tabs defaultValue="all" onValueChange={setActiveTab}>
+            <div className="flex justify-center mb-6">
+              <TabsList>
+                <TabsTrigger value="all">All Categories</TabsTrigger>
+                {faqCategories.map(category => (
+                  <TabsTrigger key={category.id} value={category.id}>
+                    {category.title}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
+            
+            <TabsContent value="all">
+              {/* FAQ content for all categories */}
+              {filteredFaqs.length > 0 ? (
+                filteredFaqs.map((category, index) => (
+                  category.faqs.length > 0 && (
+                    <div key={index} className="mb-12">
+                      <h2 className="text-2xl font-serif font-bold mb-6">{category.title}</h2>
+                      <Accordion type="single" collapsible className="space-y-4">
+                        {category.faqs.map((faq, faqIndex) => (
+                          <AccordionItem 
+                            key={faqIndex} 
+                            value={`${index}-${faqIndex}`}
+                            className="border border-gray-200 rounded-md overflow-hidden"
+                          >
+                            <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 font-medium text-left">
+                              {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="px-6 py-4 bg-gray-50">
+                              <p className="text-gray-700">{faq.answer}</p>
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </div>
+                  )
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-medium mb-3">No results found</h3>
+                  <p className="text-gray-600 mb-6">
+                    We couldn't find any FAQs matching your search. Try different keywords or browse our FAQ categories.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSearchQuery('')}
+                  >
+                    Clear Search
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+            
+            {/* Individual category tabs */}
+            {faqCategories.map(category => (
+              <TabsContent key={category.id} value={category.id}>
+                <div className="mb-12">
+                  <h2 className="text-2xl font-serif font-bold mb-6">{category.title}</h2>
+                  
+                  {filteredFaqs.find(c => c.id === category.id)?.faqs.length ? (
+                    <Accordion type="single" collapsible className="space-y-4">
+                      {filteredFaqs
+                        .find(c => c.id === category.id)?.faqs
+                        .map((faq, faqIndex) => (
+                          <AccordionItem 
+                            key={faqIndex} 
+                            value={`${category.id}-${faqIndex}`}
+                            className="border border-gray-200 rounded-md overflow-hidden"
+                          >
+                            <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 font-medium text-left">
+                              {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="px-6 py-4 bg-gray-50">
+                              <p className="text-gray-700">{faq.answer}</p>
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                    </Accordion>
+                  ) : (
+                    <div className="text-center py-12">
+                      <h3 className="text-xl font-medium mb-3">No results found</h3>
+                      <p className="text-gray-600 mb-6">
+                        We couldn't find any FAQs matching your search in this category.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setSearchQuery('')}
+                      >
+                        Clear Search
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
         
         {/* Contact section */}
         <div className="bg-gradient-to-r from-brand-orange/10 to-brand-skyBlue/10 rounded-lg p-8 text-center mt-12">
@@ -209,14 +317,74 @@ const Faq = () => {
           <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
             If you couldn't find the answer you were looking for, our customer support team is ready to help you.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button className="btn-luxury">
-              Contact Support
-            </Button>
-            <Button variant="outline">
-              Live Chat
-            </Button>
-          </div>
+          
+          {showContactForm ? (
+            <div className="max-w-md mx-auto">
+              <form onSubmit={handleContactSubmit} className="space-y-4 text-left">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={contactForm.name}
+                    onChange={handleContactFormChange}
+                    required
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={contactForm.email}
+                    onChange={handleContactFormChange}
+                    required
+                    placeholder="your-email@example.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium mb-1">Your Question</label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    value={contactForm.message}
+                    onChange={handleContactFormChange}
+                    required
+                    placeholder="What would you like to know?"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex justify-center gap-4 pt-2">
+                  <Button type="submit" className="btn-luxury">
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Message
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => setShowContactForm(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button 
+                className="btn-luxury"
+                onClick={() => setShowContactForm(true)}
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Contact Support
+              </Button>
+              <Button variant="outline">
+                Live Chat
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
