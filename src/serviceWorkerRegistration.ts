@@ -25,5 +25,6 @@ export function isPWAInstallable(): boolean {
 // Check if the app is running as an installed PWA
 export function isRunningAsPWA(): boolean {
   return window.matchMedia('(display-mode: standalone)').matches || 
-         window.navigator.standalone === true;
+         // Check for iOS standalone mode
+         (navigator as any).standalone === true;
 }
