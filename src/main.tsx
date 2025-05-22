@@ -1,6 +1,6 @@
 
 import { createRoot } from 'react-dom/client'
-import { StrictMode } from 'react'
+import React from 'react'
 import App from './App.tsx'
 import './styles/theme.css'
 import { registerServiceWorker } from './serviceWorkerRegistration'
@@ -10,12 +10,18 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 // Register service worker for PWA functionality
 registerServiceWorker();
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+const rootElement = document.getElementById("root");
+
+// Create the root first
+const root = createRoot(rootElement!);
+
+// Then render with proper React context
+root.render(
+  <React.StrictMode>
     <ThemeProvider>
       <TooltipProvider>
         <App />
       </TooltipProvider>
     </ThemeProvider>
-  </StrictMode>
+  </React.StrictMode>
 );
