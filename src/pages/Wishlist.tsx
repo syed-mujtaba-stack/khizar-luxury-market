@@ -1,43 +1,26 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
-import { mockProducts } from '@/data/mockProducts';
-
-// Mock wishlist items - use a subset of mockProducts
-const initialWishlistItems = mockProducts.slice(0, 4).map(product => ({
-  ...product,
-  addedOn: new Date().toISOString()
-}));
+import { useWishlist } from '@/hooks/useWishlist';
+import { useCart } from '@/hooks/useCart';
 
 const Wishlist = () => {
-  const [wishlistItems, setWishlistItems] = useState(initialWishlistItems);
-
-  const handleRemoveItem = (id: string) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== id));
-    toast({
-      title: "Item Removed",
-      description: "Item removed from your wishlist",
-    });
-  };
+  const { wishlistItems, removeFromWishlist, clearWishlist } = useWishlist();
+  const { addToCart } = useCart();
 
   const handleAddToCart = (id: string) => {
-    // In a real app, this would add to cart state or API
-    toast({
-      title: "Added to Cart",
-      description: "Item added to your cart",
-    });
-  };
-
-  const handleClearWishlist = () => {
-    setWishlistItems([]);
-    toast({
-      title: "Wishlist Cleared",
-      description: "All items have been removed from your wishlist",
-    });
+    const item = wishlistItems.find(item => item.id === id);
+    if (item) {
+      addToCart({
+        id: item.id,
+        name: item.name,
+        price: item.discountPrice || item.price,
+        image: item.image
+      });
+    }
   };
 
   if (wishlistItems.length === 0) {
@@ -70,8 +53,8 @@ const Wishlist = () => {
           </h1>
           <Button 
             variant="outline" 
-            className="text-red-500 border-red-500 hover:bg-red-50" 
-            onClick={handleClearWishlist}
+            className="text-red-500 border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" 
+            onClick={clearWishlist}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Clear Wishlist
@@ -81,10 +64,10 @@ const Wishlist = () => {
         {/* Wishlist items grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {wishlistItems.map(item => (
-            <div key={item.id} className="border rounded-lg overflow-hidden bg-white">
+            <div key={item.id} className="border rounded-lg overflow-hidden bg-white dark:bg-gray-800 dark:border-gray-700">
               {/* Product image */}
               <Link to={`/product/${item.id}`} className="block relative">
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 dark:bg-gray-700">
                   <img 
                     src={item.image} 
                     alt={item.name} 
@@ -97,10 +80,10 @@ const Wishlist = () => {
                 
                 {/* Remove button */}
                 <button 
-                  className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm hover:bg-white p-1.5 rounded-full"
+                  className="absolute top-2 right-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700 p-1.5 rounded-full"
                   onClick={(e) => {
                     e.preventDefault();
-                    handleRemoveItem(item.id);
+                    removeFromWishlist(item.id);
                   }}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
@@ -110,7 +93,7 @@ const Wishlist = () => {
               {/* Product details */}
               <div className="p-4">
                 <Link to={`/product/${item.id}`} className="block">
-                  <h3 className="font-medium text-lg mb-1 line-clamp-2">{item.name}</h3>
+                  <h3 className="font-medium text-lg mb-1 line-clamp-2 dark:text-white">{item.name}</h3>
                   <p className="text-brand-orange font-bold mb-3">
                     PKR {(item.discountPrice || item.price).toLocaleString()}
                   </p>

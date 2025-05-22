@@ -10,50 +10,67 @@ export interface CartItem {
   quantity: number;
 }
 
-// Initial cart items are now loaded from localStorage if available
+// Constants for localStorage keys
+const CART_STORAGE_KEY = 'khizar-luxury-market-cart';
+const COUPON_STORAGE_KEY = 'khizar-luxury-market-coupon';
+
+// Function to get initial cart items from localStorage
 const getInitialCartItems = (): CartItem[] => {
   if (typeof window === 'undefined') return [];
   
-  const savedCart = localStorage.getItem('cart');
-  
-  // If there's saved cart data, parse and return it
-  if (savedCart) {
-    try {
+  try {
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    if (savedCart) {
       return JSON.parse(savedCart);
-    } catch (error) {
-      console.error('Failed to parse cart data from localStorage:', error);
-      return [];
     }
+  } catch (error) {
+    console.error('Failed to parse cart data from localStorage:', error);
+    // Clear corrupted data
+    localStorage.removeItem(CART_STORAGE_KEY);
   }
   
-  // Fall back to demo items if no saved cart
-  return [
-    {
-      id: '1',
-      name: 'Premium Leather Handbag',
-      price: 75000,
-      image: '/images/products/bag.jpg',
-      quantity: 1
-    },
-    {
-      id: '2',
-      name: 'Luxury Watch',
-      price: 120000,
-      image: '/images/products/watch.jpg',
-      quantity: 1
-    }
-  ];
+  // Return empty array if no saved cart or error parsing
+  return [];
+};
+
+// Function to get initial coupon from localStorage
+const getInitialCoupon = (): string => {
+  if (typeof window === 'undefined') return '';
+  
+  try {
+    const savedCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
+    return savedCoupon || '';
+  } catch (error) {
+    console.error('Failed to get coupon from localStorage:', error);
+    return '';
+  }
 };
 
 export function useCart() {
   const [cartItems, setCartItems] = useState<CartItem[]>(getInitialCartItems());
-  const [couponCode, setCouponCode] = useState('');
+  const [couponCode, setCouponCode] = useState(getInitialCoupon());
   const [discount, setDiscount] = useState(0);
+
+  // Initialize discount from coupon if exists
+  useEffect(() => {
+    if (couponCode === 'discount20') {
+      setDiscount(20);
+    }
+  }, []);
 
   // Save cart items to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    }
   }, [cartItems]);
+
+  // Save coupon to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(COUPON_STORAGE_KEY, couponCode);
+    }
+  }, [couponCode]);
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -89,6 +106,15 @@ export function useCart() {
         variant: "destructive"
       });
     }
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.removeItem(CART_STORAGE_KEY);
+    toast({
+      title: "Cart Cleared",
+      description: "All items have been removed from your cart",
+    });
   };
 
   // Add item to cart functionality
@@ -128,6 +154,7 @@ export function useCart() {
     handleQuantityChange,
     handleRemoveItem,
     handleApplyCoupon,
-    addToCart
+    addToCart,
+    clearCart
   };
 }
