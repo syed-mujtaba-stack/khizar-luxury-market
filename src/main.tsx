@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
+import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './styles/theme.css'
 import { registerServiceWorker } from './serviceWorkerRegistration'
@@ -17,16 +17,16 @@ if (!rootElement) {
   throw new Error("Root element not found");
 }
 
-// Create the root first
-const root = createRoot(rootElement);
+// Create the root
+const root = ReactDOM.createRoot(rootElement);
 
-// Then render with proper React context
+// Render with proper React context
 root.render(
   <React.StrictMode>
-    <TooltipProvider>
-      <ThemeProvider>
+    <ThemeProvider>
+      <TooltipProvider>
         <App />
-      </ThemeProvider>
-    </TooltipProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );
