@@ -5,7 +5,7 @@ import App from './App.tsx'
 import './styles/theme.css'
 import { registerServiceWorker } from './serviceWorkerRegistration'
 import { ThemeProvider } from './context/ThemeContext'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
+import { TooltipProvider } from './components/ui/tooltip'
 
 // Register service worker for PWA functionality
 registerServiceWorker();
