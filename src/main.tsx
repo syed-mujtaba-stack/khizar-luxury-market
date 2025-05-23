@@ -5,7 +5,7 @@ import App from './App.tsx'
 import './styles/theme.css'
 import { registerServiceWorker } from './serviceWorkerRegistration'
 import { ThemeProvider } from './context/ThemeContext'
-import { TooltipProvider } from './components/ui/tooltip'
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 
 // Register service worker for PWA functionality
 registerServiceWorker();
@@ -24,7 +24,7 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ThemeProvider>
-      <TooltipProvider delayDuration={0}>
+      <TooltipProvider>
         <App />
       </TooltipProvider>
     </ThemeProvider>
