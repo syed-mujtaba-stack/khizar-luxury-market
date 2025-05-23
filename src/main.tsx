@@ -20,7 +20,7 @@ if (!rootElement) {
 // Create the root
 const root = ReactDOM.createRoot(rootElement);
 
-// Render with proper React context
+// Render the app within providers
 root.render(
   <React.StrictMode>
     <ThemeProvider>
